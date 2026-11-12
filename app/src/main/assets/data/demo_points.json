@@ -1,0 +1,27 @@
+{
+ "start": "2026-11-13T18:40:00+09:00",
+ "hydrant": {
+  "lat": 37.6544144,
+  "lon": 127.0589838,
+  "headingDeg": 74.7,
+  "facility": "HYD-노원-현장-001491",
+  "name": "지상식소화전 로그인 편의점 앞",
+  "distanceM": 3.0
+ },
+ "busStop": {
+  "lat": 37.6553542,
+  "lon": 127.0593269,
+  "headingDeg": 73.6,
+  "facility": "BUS-110000679",
+  "name": "노원역8번출구",
+  "distanceM": 6.99
+ },
+ "crosswalk": {
+  "lat": 37.6537038,
+  "lon": 127.0578261,
+  "headingDeg": 254.0,
+  "facility": "CRW-06-0000017116",
+  "name": "횡단보도 상계동 739도",
+  "distanceM": 5.0
+ }
+}

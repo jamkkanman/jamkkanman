@@ -1,0 +1,26 @@
+{
+  "id": "02_hydrant_gear_p",
+  "title": "소화전 앞 정차",
+  "start": "2026-11-13T18:40+09:00",
+  "note": "소화전 3m 옆에서 기어 P. 첫 안내, 운전자 \"응\", 공영주차장으로 내비 목적지 변경.",
+  "expect": { "alerts": 1, "route": "true" },
+  "events": [
+    {"t":0.0,"type":"GEAR","gear":"D"},
+    {"t":0.0,"type":"BELT","buckled":true},
+    {"t":0.0,"type":"DOOR","open":false},
+    {"t":0.0,"type":"SPEED","kmh":32.0},
+    {"t":0.0,"type":"LOCATION","lat":37.654200824233456,"lon":127.05799770447484,"acc":4.0},
+    {"t":2.0,"type":"LOCATION","lat":37.6542969333284,"lon":127.05844144746116,"acc":4.0},
+    {"t":4.0,"type":"LOCATION","lat":37.654371684846694,"lon":127.05878658089496,"acc":4.0},
+    {"t":4.5,"type":"SPEED","kmh":14.0},
+    {"t":6.0,"type":"LOCATION","lat":37.65440372121167,"lon":127.05893449522374,"acc":4.0},
+    {"t":7.0,"type":"SPEED","kmh":0.0},
+    {"t":7.5,"type":"LOCATION","lat":37.6544144,"lon":127.0589838,"acc":4.0},
+    {"t":11.5,"type":"GEAR","gear":"P"},
+    {"t":19.5,"type":"REPLY","text":"응","via":"voice","audio":"demo_voice/reply_yes.wav"},
+    {"t":29.0,"type":"GEAR","gear":"D"},
+    {"t":30.0,"type":"SPEED","kmh":18.0},
+    {"t":33.0,"type":"LOCATION","lat":37.65448559192218,"lon":127.05931249850838,"acc":4.0},
+    {"t":34.0,"type":"SPEED","kmh":30.0}
+  ]
+}

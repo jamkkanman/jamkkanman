@@ -1,0 +1,27 @@
+{
+  "id": "03_busstop_door",
+  "title": "버스정류소 앞 하차",
+  "start": "2026-11-13T18:40+09:00",
+  "note": "정류소 7m 앞에서 비상등 없이 문 열림. 내리기 직전 안내, \"금방 가\", 50초 뒤 한 번만 더 안내.",
+  "expect": { "alerts": 2 },
+  "events": [
+    {"t":0.0,"type":"GEAR","gear":"D"},
+    {"t":0.0,"type":"BELT","buckled":true},
+    {"t":0.0,"type":"DOOR","open":false},
+    {"t":0.0,"type":"SPEED","kmh":32.0},
+    {"t":0.0,"type":"LOCATION","lat":37.6551256761205,"lon":127.05834615258937,"acc":4.0},
+    {"t":2.0,"type":"LOCATION","lat":37.65522851186628,"lon":127.05878748892415,"acc":4.0},
+    {"t":4.0,"type":"LOCATION","lat":37.6553084952241,"lon":127.05913075051788,"acc":4.0},
+    {"t":4.5,"type":"SPEED","kmh":14.0},
+    {"t":6.0,"type":"LOCATION","lat":37.65534277380603,"lon":127.05927786262947,"acc":4.0},
+    {"t":7.0,"type":"SPEED","kmh":0.0},
+    {"t":7.5,"type":"LOCATION","lat":37.6553542,"lon":127.0593269,"acc":4.0},
+    {"t":12.0,"type":"DOOR","open":true},
+    {"t":18.0,"type":"REPLY","text":"금방 갈게","via":"voice","audio":"demo_voice/reply_soon.wav"},
+    {"t":22.0,"type":"DOOR","open":false},
+    {"t":74.0,"type":"GEAR","gear":"D"},
+    {"t":75.0,"type":"SPEED","kmh":18.0},
+    {"t":78.0,"type":"LOCATION","lat":37.6554303746265,"lon":127.05965381580354,"acc":4.0},
+    {"t":79.0,"type":"SPEED","kmh":30.0}
+  ]
+}
