@@ -85,10 +85,13 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * adb hooks for scripted demos and tests, for example
+     * adb hooks for scripted demos and tests (debug builds only), for example
      * `adb shell am start -n app.jamkkanman/.MainActivity --es action replay --es asset scenarios/02_hydrant_gear_p.json`.
      */
     private fun handleIntent(intent: Intent?) {
+        // The launcher activity is exported, so these scripted-demo hooks exist only in debug builds.
+        // A release build never takes a driver answer or a route change from another app's intent.
+        if (!BuildConfig.DEBUG) return
         when (intent?.getStringExtra("action")) {
             "replay" -> { screen = Screen.MAIN; host.startReplay(intent.getStringExtra("asset") ?: return) }
             "live" -> { screen = Screen.MAIN; host.backToLive() }

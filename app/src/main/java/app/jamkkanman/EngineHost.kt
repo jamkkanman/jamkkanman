@@ -298,18 +298,24 @@ class EngineHost(private val context: Context) {
     private fun addLog(t: Long, event: String, decision: String, phase: Phase = engine.phase) {
         val base = if (_state.value.mode == Mode.REPLAY) replayStart else sessionStart
         val line = UiLog((t - base) / 1000.0, phase, event, decision)
-        Log.i(TAG, "LOG %.1f [%s] %s | %s".format(line.t, phase.label, event, decision))
+        // Decision logs can name a recognized answer; they go to logcat only in debug builds.
+        if (BuildConfig.DEBUG) Log.i(TAG, "LOG %.1f [%s] %s | %s".format(line.t, phase.label, event, decision))
         update { it.copy(logs = (listOf(line) + it.logs).take(300)) }
     }
 
     private fun voice(msg: String) {
-        Log.i(TAG, "VOICE $msg")
+        if (BuildConfig.DEBUG) Log.i(TAG, "VOICE $msg")
         update { it.copy(voiceEvent = msg) }
     }
 
     private inline fun update(f: (UiState) -> UiState) { _state.value = f(_state.value) }
 
+    /**
+     * Writes live signals (including location) to app-private storage in the replay format.
+     * Debug builds only: a release build keeps no location trace on disk.
+     */
     private fun openRecorder() {
+        if (!BuildConfig.DEBUG) return
         runCatching {
             val dir = File(context.filesDir, "recordings").apply { mkdirs() }
             val name = "live-" + SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date()) + ".jsonl"

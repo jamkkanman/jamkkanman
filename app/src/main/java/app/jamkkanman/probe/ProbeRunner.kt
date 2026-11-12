@@ -69,7 +69,9 @@ class ProbeRunner(private val context: Context) {
             if (lastDetail[key] == "$status$detail") return
             lastDetail[key] = "$status$detail"
         }
-        Log.i(TAG, "[$status] $key | $title | $detail")
+        // Details can hold coordinates or recognized speech; release builds log only the outcome.
+        if (app.jamkkanman.BuildConfig.DEBUG) Log.i(TAG, "[$status] $key | $title | $detail")
+        else Log.i(TAG, "[$status] $key")
         main.post {
             val list = _items.value.toMutableList()
             val i = list.indexOfFirst { it.key == key }

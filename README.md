@@ -108,8 +108,9 @@ Virtual Console은 브라우저 세션 신호가 1초마다 와야 쓰기를 받
 
 ### 시나리오 재생기
 
-- 실차 신호 원천과 재생기가 같은 `Signal` 객체를 엔진에 넣습니다. 실차 신호 모드는 받은 신호를 그대로 JSON 줄 형식으로
-  `files/recordings/live-*.jsonl`에 기록하고, 이 파일은 `Scenario.fromRecording`으로 다시 재생됩니다.
+- 실차 신호 원천과 재생기가 같은 `Signal` 객체를 엔진에 넣습니다. 디버그 빌드의 실차 신호 모드는 받은 신호를 그대로 JSON 줄 형식으로
+  `files/recordings/live-*.jsonl`(앱 전용 저장소)에 기록하고, 이 파일은 `Scenario.fromRecording`으로 다시 재생됩니다.
+  release 빌드는 위치 기록을 남기지 않고, logcat에도 좌표와 인식된 말을 쓰지 않습니다.
 - 시연 시나리오: `app/src/main/assets/scenarios/*.json` (`./gradlew :core:demoScenarios`로 시연 지점에서 생성)
 - 형식 예: `{"t": 11.5, "type": "GEAR", "gear": "P"}`, `{"t": 19.5, "type": "REPLY", "text": "응", "audio": "demo_voice/reply_yes.wav"}`
 
@@ -137,7 +138,7 @@ Virtual Console은 브라우저 세션 신호가 1초마다 와야 쓰기를 받
 - [`apk/jamkkanman_잠깐만_release.apk`](apk/)
 - 개인 참가라 파일명 규칙의 팀명 자리는 실명 대신 별칭 `jamkkanman`을 썼습니다(접수 양식의 실명 비노출 규칙).
 
-## 7. 시연용 adb 명령
+## 7. 시연용 adb 명령 (디버그 빌드만)
 
 ```
 adb shell am start -n app.jamkkanman/.MainActivity --es action replay --es asset scenarios/02_hydrant_gear_p.json
@@ -146,6 +147,7 @@ adb shell am start -n app.jamkkanman/.MainActivity --es action live
 adb shell am start -n app.jamkkanman/.MainActivity --es action metrics
 ```
 
+이 명령은 디버그 빌드(`./gradlew :app:assembleDebug`)에서만 동작합니다. release APK는 다른 앱의 인텐트로 응답이나 경로 변경을 받지 않도록 막았고, 화면 아래 버튼으로 같은 시나리오를 재생할 수 있습니다.
 `driver_voice`는 운전자 대답을 녹음한 파일(Windows 한국어 TTS로 만든 16kHz 음성)을 스피커로 재생하면서 같은 파일을 SpeechToText `sendAudio`로 넣습니다.
 에뮬레이터 마이크 대신 쓰는 시연 장치이고, 인식 결과는 실제 STT 엔진이 낸 것입니다.
 
