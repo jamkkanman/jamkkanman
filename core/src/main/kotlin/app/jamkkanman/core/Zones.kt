@@ -16,7 +16,7 @@ enum class ZoneType(
 ) {
     // 40,000 won, or 80,000 won where a safety sign (red curb) is installed; the data has no sign field.
     HYDRANT("소화전", 5.0, 80_000, "최대 8만원", 2),
-    BUS_STOP("버스정류소", 10.0, 40_000, "4만원", 1),
+    BUS_STOP("버스정류장", 10.0, 40_000, "4만원", 1),
     CROSSWALK("횡단보도", 10.0, 40_000, "4만원", 1),
     CHILD_ZONE("어린이보호구역", 0.0, 120_000, "12만원", 3),
 }

@@ -86,8 +86,8 @@ fun main(args: Array<String>) {
             b.list += Signal.ReplyText(b.ms(18.0), "금방 갈게", "voice", "demo_voice/reply_soon.wav")
             b.list += Signal.DriverDoor(b.ms(22.0), false)
             b.leave(75.0, stop, Pair(bk.first / 3, bk.second / 3))
-            Scenario("03_busstop_door", "버스정류소 앞 하차", start, b.list.sortedBy { it.t }, expectAlerts = 2,
-                note = "정류소 7m 앞에서 비상등 없이 문 열림. 내리기 직전 안내, \"금방 가\", 50초 뒤 한 번만 더 안내.")
+            Scenario("03_busstop_door", "버스정류장 앞 하차", start, b.list.sortedBy { it.t }, expectAlerts = 2,
+                note = "정류장 7m 앞에서 비상등 없이 문 열림. 내리기 직전 안내, \"금방 가\", 50초 뒤 한 번만 더 안내.")
         },
     )
     for (sc in scenarios) {

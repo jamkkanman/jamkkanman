@@ -8,7 +8,7 @@ import kotlin.test.assertTrue
 object Street {
     val base = LatLon(37.5700, 126.9800)
     val hydrant = Facility("HYD-1", ZoneType.HYDRANT, "소화전 1", Geo.offset(base, 0.0, 0.0))
-    val bus = Facility("BUS-1", ZoneType.BUS_STOP, "정류소 1", Geo.offset(base, 100.0, 0.0))
+    val bus = Facility("BUS-1", ZoneType.BUS_STOP, "정류장 1", Geo.offset(base, 100.0, 0.0))
     val cross = Facility("CRS-1", ZoneType.CROSSWALK, "횡단보도 1", Geo.offset(base, 200.0, 0.0), extraM = 4.0)
     val lotNear = ParkingLot(
         "PK-1", "가까운공영주차장", Geo.offset(base, 0.0, 180.0), "서울 어딘가 1", "PK-1",
@@ -78,9 +78,9 @@ class EngineTest {
     @Test
     fun doorOpenNearBusStopWithoutIntentSpeaksAlightForm() {
         val p = Street.at(Street.bus, 7.0)
-        val r = run(Drive("정류소 문 열림").approach(p, 10.0).door(16.0, true))
+        val r = run(Drive("정류장 문 열림").approach(p, 10.0).door(16.0, true))
         assertEquals(1, r.alerts.size)
-        assertEquals("내리시기 전에, 여기는 버스정류소 10미터 안입니다.", r.alerts[0].text)
+        assertEquals("내리시기 전에, 여기는 버스정류장 10미터 안입니다.", r.alerts[0].text)
     }
 
     @Test

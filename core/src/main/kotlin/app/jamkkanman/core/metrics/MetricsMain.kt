@@ -47,7 +47,7 @@ fun main(args: Array<String>) {
     val allStops = waits.stops + stops.stops
     val allAlerts = waits.alerts + stops.alerts
     line()
-    line("- 신호 대기 100개(횡단보도, 정류소, 소화전의 금지 거리 안에서 20~120초 정지, 기어 D, 벨트 착용, 문 닫힘, 일부는 GPS 흔들림과 서다 가다 포함)의 오경보: **${waits.alerts}회**.")
+    line("- 신호 대기 100개(횡단보도, 정류장, 소화전의 금지 거리 안에서 20~120초 정지, 기어 D, 벨트 착용, 문 닫힘, 일부는 GPS 흔들림과 서다 가다 포함)의 오경보: **${waits.alerts}회**.")
     line("- 금지 구역 정차 100개의 응답 가정: 응답 없이 문 열림 40%, \"응\" 30%, \"금방 가\" 후 50초 넘게 정차 15%, \"괜찮아\" 15%. 의도 신호는 기어 P 60%, 목적지 도착 20%, 문 열림만 20%.")
     line("- 두 묶음을 합친 정차 ${allStops}번의 정차당 발화는 평균 %.2f회, 최대 ${maxOf(waits.maxAlertsPerStop, stops.maxAlertsPerStop)}회. 주차장 안내와 응답 확인 문장은 운전자가 요청한 대답이라 발화 예산에서 뺐다.".format(allAlerts.toDouble() / allStops))
     if (waits.failures.isNotEmpty() || stops.failures.isNotEmpty()) {
@@ -59,7 +59,7 @@ fun main(args: Array<String>) {
 
     line("## 3. 구역 판정 정밀도와 재현율 (위치 잡음)")
     line()
-    line("시설 200곳(소화전형 R=5m 100곳, 정류소형 R=10m 100곳), 참 거리 2, 4, 6, 8, 12, 20m, 축마다 정규 잡음, 지점마다 50회 반복(조합당 60,000건).")
+    line("시설 200곳(소화전형 R=5m 100곳, 정류장형 R=10m 100곳), 참 거리 2, 4, 6, 8, 12, 20m, 축마다 정규 잡음, 지점마다 50회 반복(조합당 60,000건).")
     line("\"안\"은 d <= R만 금지로 본 결과, \"안+가까이\"는 d <= R + m까지 말한 결과다.")
     line()
     line("| 잡음 표준편차 | 오차 여유 m | \"안\" 정밀도 | \"안\" 재현율 | \"안+가까이\" 정밀도 | \"안+가까이\" 재현율 |")
