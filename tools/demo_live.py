@@ -1,11 +1,12 @@
-"""Runs the live demo scenes on the Pleos Connect emulator and records each with the emulator's own recorder.
+"""Runs the live demo scenes on the Pleos Connect emulator and records each from the emulator window.
 
 Every input is a real emulator signal: Virtual Console HTTP API (speed, gear, door), `adb emu geo fix` (location),
 and an adb intent that plays a recorded driver answer into SpeechToText. Usage:
 
     python tools/demo_live.py <points.json> <out_dir> [scene ...]
 
-Scenes: wait, hydrant, busstop, metrics. The emulator recorder writes WebM (VP9 video, Vorbis audio).
+Scenes: wait, hydrant, busstop, metrics. Each scene is an MP4 from tools/record_window.py (window picture on the GPU
+encoder, emulator sound over gRPC), so run this with a Python that has grpcio and grpcio-tools.
 """
 import json, os, subprocess, sys, threading, time, uuid, urllib.request, urllib.error
 
@@ -36,14 +37,21 @@ def heartbeat(stop):
 
 
 def put(path):
-    try:
-        _req("PUT", path)
-    except urllib.error.HTTPError as e:
-        print("PUT failed", path, e.code, flush=True)
+    for attempt in range(4):
+        try:
+            _req("PUT", path)
+            return
+        except urllib.error.HTTPError as e:
+            print("PUT failed", path, e.code, flush=True)
+            return
+        except (urllib.error.URLError, ConnectionError, OSError) as e:  # the console dropped a connection once
+            print("PUT retry", path, e, flush=True)
+            time.sleep(0.3)
 
 
 def log(msg):
-    print(time.strftime("%H:%M:%S"), msg, flush=True)
+    now = time.time()
+    print(time.strftime("%H:%M:%S", time.localtime(now)) + f".{int(now * 1000) % 1000:03d}", msg, flush=True)
 
 
 def speed(kmh):
@@ -113,22 +121,37 @@ def drive_out(stop, heading):
 
 
 NO_RECORD = os.environ.get("NO_RECORD") == "1"
+# The emulator's own recorder (`adb emu screenrecord`) kept about five new frames a second of the Pleos driving
+# view and slowed the guest, so the scenes are recorded from the emulator window instead (record_window.py).
+RECORDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "record_window.py")
+_rec = {}
 
 
 def record_start(path):
     if NO_RECORD:
         log("record skipped")
         return
-    # 1920x1080 keeps the emulator's encoder load low enough that the guest stays responsive.
-    adb("emu", "screenrecord", "start", "--size", "1920x1080", "--time-limit", "180", "--bit-rate", "10000000", path)
-    log(f"record start {path}")
+    adb("logcat", "-c")  # the scene's app log is kept next to the recording (align_audio.py reads it)
+    p = subprocess.Popen([sys.executable, RECORDER, path], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                         text=True, encoding="utf-8", errors="replace")
+    line = p.stdout.readline().strip()  # "recording t0=..." once the first frame is in
+    if not line.startswith("recording"):
+        raise SystemExit(f"recorder did not start: {line}")
+    _rec["p"], _rec["path"] = p, path
+    log(f"record start {path} ({line})")
 
 
 def record_stop():
     if NO_RECORD:
         return
-    adb("emu", "screenrecord", "stop")
-    log("record stop")
+    p = _rec.pop("p")
+    p.stdin.write("stop\n")
+    p.stdin.close()
+    tail = p.stdout.read().strip()
+    p.wait()
+    with open(_rec["path"][:-4] + ".applog.txt", "w", encoding="utf-8") as f:
+        f.write(adb("logcat", "-d", "-v", "epoch", "-s", "JKM:I").stdout)
+    log(f"record stop ({tail.splitlines()[-1] if tail else 'no output'})")
 
 
 def tap_text(label):
@@ -161,7 +184,11 @@ def clear_navi():
     log("no route to end")
 
 
-def reset():
+def reset(start=None):
+    if start is not None:
+        # Put the car where the drive will begin first, so the app's judgment from the previous scene's
+        # stop is replaced before recording (it stays on screen while driving otherwise).
+        geo(start)
     speed(0)
     clear_navi()
     app("live")
@@ -175,8 +202,8 @@ def reset():
 def scene_wait(pts, out):
     stop = (pts["crosswalk"]["lat"], pts["crosswalk"]["lon"])
     heading = pts["crosswalk"].get("headingDeg", 90.0)
-    reset()
-    record_start(os.path.join(out, "scene1_wait.webm"))
+    reset(along(stop, heading, -120))
+    record_start(os.path.join(out, "scene1_wait.mp4"))
     time.sleep(1.5)
     drive_in(stop, heading)
     time.sleep(14)          # red light: speed 0, gear D, door closed
@@ -190,8 +217,8 @@ def scene_wait(pts, out):
 def scene_hydrant(pts, out):
     stop = (pts["hydrant"]["lat"], pts["hydrant"]["lon"])
     heading = pts["hydrant"].get("headingDeg", 90.0)
-    reset()
-    record_start(os.path.join(out, "scene2_hydrant.webm"))
+    reset(along(stop, heading, -120))
+    record_start(os.path.join(out, "scene2_hydrant.mp4"))
     time.sleep(1.5)
     drive_in(stop, heading)
     time.sleep(4.5)
@@ -207,8 +234,8 @@ def scene_hydrant(pts, out):
 def scene_busstop(pts, out):
     stop = (pts["busStop"]["lat"], pts["busStop"]["lon"])
     heading = pts["busStop"].get("headingDeg", 90.0)
-    reset()
-    record_start(os.path.join(out, "scene3_busstop.webm"))
+    reset(along(stop, heading, -120))
+    record_start(os.path.join(out, "scene3_busstop.mp4"))
     time.sleep(1.5)
     drive_in(stop, heading)
     time.sleep(5)
@@ -227,7 +254,7 @@ def scene_busstop(pts, out):
 def scene_metrics(pts, out):
     app("live")
     time.sleep(1)
-    record_start(os.path.join(out, "scene4_metrics.webm"))
+    record_start(os.path.join(out, "scene4_metrics.mp4"))
     time.sleep(1)
     app("metrics")
     time.sleep(25)
